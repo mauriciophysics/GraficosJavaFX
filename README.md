@@ -24,4 +24,4 @@ Grafico g = new Grafico();
 g.plotPontos(x, y, "Pontos", Estilo.MARCADOR);
 g.show(stage);</code></pre>
 
-![Gráfico de conjunto de pontos](https://github.com/mauriciophysics/GraficosJavaFX/tree/main/GraficoDePontos.png)
+![Gráfico de pontos](https://github.com/mauriciophysics/GraficosJavaFX/tree/main/GraficoDePontos.png)
