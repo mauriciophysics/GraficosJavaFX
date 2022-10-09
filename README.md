@@ -15,7 +15,7 @@ Grafico g = new Grafico();
 g.plotFuncao(f, 0, 2*Math.PI, "Seno");
 g.show(stage);</pre></code>
 
-![Gráfico de função](https://github.com/mauriciophysics/GraficosJavaFX/blob/main/GraficoDeFuncao.png)
+![Gráfico de função](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/GraficoDeFuncao.png)
 
 Exemplo de gráfico de pontos:
 <pre><code>Double[] x = {1.0, 2.2, 3.84, 4.9};
@@ -24,4 +24,4 @@ Grafico g = new Grafico();
 g.plotPontos(x, y, "Pontos", Estilo.LINHA_E_MARCADOR);
 g.show(stage);</code></pre>
 
-![Gráfico de pontos](https://github.com/mauriciophysics/GraficosJavaFX/blob/main/GraficoDePontos.png)
+![Gráfico de pontos](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/GraficoDePontos.png)
