@@ -13,7 +13,7 @@
     </properties>
     
     <name>Gráficos Java FX</name>
-    <description>Construção de gráficos baseados a API JavaFX.</description>
+    <description>Construção de gráficos baseados na API JavaFX.</description>
     <url>https://github.com/mauriciophysics/GraficosJavaFX</url>
 
     <licenses>

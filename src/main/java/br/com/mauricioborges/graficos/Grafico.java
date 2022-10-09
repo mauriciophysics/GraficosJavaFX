@@ -103,7 +103,7 @@ public final class Grafico extends Application {
      */
     public void plotPontos(Double[] x, Double[] y, String titulo, Estilo estilo) {
         if (x.length != y.length) {
-            throw new UnsupportedOperationException("Os de X e Y devem ter o mesmo tamnho.");
+            throw new UnsupportedOperationException("Os arrays de X e Y devem ter o mesmo tamanho.");
         }
         this.x.add(x);
         this.y.add(y);
