@@ -30,7 +30,7 @@ Exemplo de gráfico de pontos com linha de tendência:
 <pre><code>Double[] x = {1.0, 2.2, 3.84, 4.9, 5.6, 6.2};
 Double[] y = {2.24, 3.71, 4.5, 5.96, 8.48, 16.8};
 Grafico g = new Grafico();
-g.plotPontos(x, y, "Pontos", Estilo.MARCADOR, LinhaDeTendencia.LINEAR);
+g.plotPontos(x, y, "Pontos", Estilo.MARCADOR, LinhaDeTendencia.QUADRATICA);
 g.show(stage);</code></pre>
 
 ![Gráfico de pontos com linha de tendência](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDePontosComLinhaDeTendencia.png)
