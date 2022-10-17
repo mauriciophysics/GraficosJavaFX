@@ -35,4 +35,4 @@ g.show(stage);</code></pre>
 
 ![Gráfico de pontos com linha de tendência](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDePontosComLinhaDeTendencia.png)
 
-Para salvar uma imagen do gráfico, basta clicar com o botão direito do mouse e escolher a opção no menu!
+Para salvar uma imagem do gráfico, basta clicar com o botão direito do mouse e escolher a opção no menu!
