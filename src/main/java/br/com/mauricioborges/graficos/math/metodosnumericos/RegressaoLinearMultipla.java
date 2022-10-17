@@ -17,6 +17,7 @@ public class RegressaoLinearMultipla {
     private final int p;
     private final Double[][] X;
     private final Double[] Y;
+    private double b0 = Double.MAX_VALUE;
 
     // resultados
     private double r2 = 0;
@@ -37,6 +38,25 @@ public class RegressaoLinearMultipla {
         this.p = p;
         this.X = X;
         this.Y = Y;
+    }
+
+    /**
+     * REGRESSÃO LINEAR MÚLTIPLA
+     *
+     * @param n (número de pontos)
+     * @param v (número de variáveis)
+     * @param p (número de parâmetros)
+     * @param X (matriz de dimensão N x V contendo as variáveis explicativas)
+     * @param Y (matriz de dimensão N contendo as variáveis respostas)
+     * @param b0 (ponto de intersecção com o eixo Y)
+     */
+    public RegressaoLinearMultipla(int n, int v, int p, Double[][] X, Double[] Y, double b0) {
+        this.n = n;
+        this.v = v;
+        this.p = p;
+        this.X = X;
+        this.Y = Y;
+        this.b0 = b0;
     }
 
     /**

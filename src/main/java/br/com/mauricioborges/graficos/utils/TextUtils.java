@@ -1,5 +1,7 @@
 package br.com.mauricioborges.graficos.utils;
 
+import java.text.DecimalFormat;
+
 /**
  * Utilitários para texto
  *
@@ -14,43 +16,58 @@ public abstract class TextUtils {
      * @param number número
      * @return string contendo o número sobrescrito
      */
-    public static String sup(int number) {
-        char[] array = String.valueOf(number).toCharArray();
+    public static String sup(double number) {
+        DecimalFormat df = new DecimalFormat();
+        return sup(df.format(number));
+    }
+
+    /**
+     * Sobrescrever textos
+     *
+     * @param texto texto
+     * @return string contendo o texto sobrescrito
+     */
+    public static String sup(String texto) {
+        char[] array = texto.toCharArray();
         StringBuilder sb = new StringBuilder();
         for (char c : array) {
-            try {
-                sb.append(supAlgarismo(Integer.parseInt(String.valueOf(c))));
-            } catch (NumberFormatException e) {
-                sb.append(c);
-            }
+            sb.append(supChar(c));
         }
         return sb.toString();
     }
 
-    private static String supAlgarismo(int n) {
-        switch (n) {
-            case 0:
+    private static String supChar(char c) {
+        switch (c) {
+            case '0':
                 return "⁰";
-            case 1:
+            case '1':
                 return "¹";
-            case 2:
+            case '2':
                 return "²";
-            case 3:
+            case '3':
                 return "³";
-            case 4:
+            case '4':
                 return "⁴";
-            case 5:
+            case '5':
                 return "⁵";
-            case 6:
+            case '6':
                 return "⁶";
-            case 7:
+            case '7':
                 return "⁷";
-            case 8:
+            case '8':
                 return "⁸";
-            case 9:
+            case '9':
                 return "⁹";
+            case '-':
+                return "⁻";
+            case ',':
+                return "ʼ";
+            case '.':
+                return "·";
+            case 'x':
+                return "ˣ";
             default:
-                return null;
+                return "";
         }
     }
 
