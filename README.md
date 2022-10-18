@@ -6,7 +6,7 @@ Dependência maven:
 <pre><code>&lt;dependency&gt;
     &lt;groupId&gt;io.github.mauriciophysics&lt;/groupId&gt;
     &lt;artifactId&gt;Graficos&lt;/artifactId&gt;
-    &lt;version&gt;1.3&lt;/version&gt;
+    &lt;version&gt;1.4&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 
 Exemplo de gráfico de função:
