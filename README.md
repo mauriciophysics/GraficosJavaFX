@@ -35,6 +35,7 @@ g.show(stage);</code></pre>
 
 ![Gráfico de pontos com linha de tendência](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDePontosComLinhaDeTendencia.png)
 
+A linha de tendência pode ser personalizada, através do padrão Builder
 <pre><code>Double[] x = {1.0, 2.2, 3.84, 4.9, 5.6, 6.2};
 Double[] y = {2.24, 3.71, 4.5, 5.96, 8.48, 16.8};
 Grafico g = new Grafico();
@@ -56,13 +57,13 @@ Estilo estilo = new Estilo.Builder()
 	.setExibirLinha(false)
 	.setCor(DARKBLUE)
 	.build();
-Estilo estiloLinha = new Estilo.Builder()
+Estilo estiloLinhaTendencia = new Estilo.Builder()
 	.setCor(DARKRED)
 	.setEstiloLinha(TRACEJADA)
 	.build();
 LinhaDeTendencia quadratica = new LinhaDeTendencia.Builder(POLINOMIAL)
 	.setGrau(2)
-	.setEstilo(estiloLinha)
+	.setEstilo(estiloLinhaTendencia)
 	.build();
 g.plotPontos(x, y, "Pontos", estilo, quadratica);
 g.show(stage);</code></pre>

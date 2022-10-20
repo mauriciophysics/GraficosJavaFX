@@ -22,7 +22,7 @@ public abstract class FileUtils {
     /**
      * Retorna o último diretorio utilizado pelo usuário em algum FileChooser
      *
-     * @return
+     * @return diretório atual
      */
     public static File getDiretorioAtual() {
         return diretorioAtual;
@@ -148,14 +148,35 @@ public abstract class FileUtils {
         return pathName.toString();
     }
 
+    /**
+     * Tipo de janela
+     */
     public static enum Tipo {
+        /**
+         * Abrir arquivos
+         */
         OPEN,
+        /**
+         * Abrir múltiplos arquivos
+         */
         OPEN_MULTIPLE,
+        /**
+         * Salvar arquivos
+         */
         SAVE
     }
 
+    /**
+     * Diretório inicial ao abrir a janela
+     */
     public static enum DiretorioInicial {
+        /**
+         * Este computador (Windows)
+         */
         ESTE_COMPUTADOR(null),
+        /**
+         * Raiz da pasta do usuário
+         */
         PASTA_USUARIO(new File(System.getProperty("user.home")));
 
         private final File diretorio;
@@ -164,6 +185,11 @@ public abstract class FileUtils {
             this.diretorio = diretorio;
         }
 
+        /**
+         * Obter o diretório
+         *
+         * @return diretório
+         */
         public File getDiretorio() {
             return diretorio;
         }
