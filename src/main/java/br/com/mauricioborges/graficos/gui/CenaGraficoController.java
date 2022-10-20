@@ -7,6 +7,7 @@ import static br.com.mauricioborges.graficos.LinhaDeTendencia.Tipo.LOGARITMICA;
 import static br.com.mauricioborges.graficos.LinhaDeTendencia.Tipo.POLINOMIAL;
 import br.com.mauricioborges.graficos.math.Funcao;
 import br.com.mauricioborges.graficos.math.metodosnumericos.RegressaoLinearMultipla;
+import br.com.mauricioborges.graficos.utils.ChartUtils;
 import br.com.mauricioborges.graficos.utils.FileUtils;
 import br.com.mauricioborges.graficos.utils.FileUtils.Tipo;
 import static br.com.mauricioborges.graficos.utils.TextUtils.sup;
@@ -92,8 +93,9 @@ public class CenaGraficoController implements Initializable {
      * @param inicio início do intervalo
      * @param fim fim do intervalo
      * @param titulo legenda do gráfico
+     * @param estilo opções de estilo
      */
-    public void plotFuncao(Funcao funcao, double inicio, double fim, String titulo) {
+    public void plotFuncao(Funcao funcao, double inicio, double fim, String titulo, Estilo estilo) {
         new Thread(() -> {
             XYChart.Series<Number, Number> dados = new XYChart.Series<>();
             dados.setName(titulo);
@@ -121,12 +123,20 @@ public class CenaGraficoController implements Initializable {
             Platform.runLater(() -> {
                 // adicionando a função no gráfico
                 this.graficoLinhas.getData().add(dados);
-                // diminui o tamanho das bolinhas do gráfico para 1px
-                for (int i = 0; i < dados.getData().size(); i++) {
-                    dados.getData().get(i).getNode().lookup(".chart-line-symbol").setStyle("-fx-padding: 1.2px;");
-                }
+                // diminui o tamanho das bolinhas do gráfico
+                ChartUtils.setTamanhoMarcador(dados, 1.2);
                 // tira a linha que liga as bolinhas
-                dados.getNode().lookup(".chart-series-line").setStyle("-fx-stroke-width: 0px;");
+                ChartUtils.setLarguraLinha(dados, 0);
+                // configurações de cor
+                if (estilo == null) {
+                    return;
+                }
+                if (estilo.getCor() != null) {
+                    // muda a cor do gráfico
+                    ChartUtils.setCor(dados, estilo.getCor());
+                }
+                // define o estilo da linha
+                ChartUtils.setEstiloLinha(dados, estilo.getEstiloLinha());
             });
         }).start();
     }
@@ -153,17 +163,23 @@ public class CenaGraficoController implements Initializable {
                 // adicionando os pontos no gráfico
                 this.graficoLinhas.getData().add(dados);
                 // estilo do gráfico
-                switch (estilo) {
-                    case LINHA:
-                        for (int i = 0; i < dados.getData().size(); i++) {
-                            dados.getData().get(i).setNode(null); // tira as bolinhas do gráfico
-                        }
-                        break;
-                    case MARCADOR:
-                        // tira a linha que liga as bolinhas
-                        dados.getNode().lookup(".chart-series-line").setStyle("-fx-stroke-width: 0px;");
-                        break;
+                if (estilo == null) {
+                    return;
                 }
+                if (!estilo.exibirMarcador()) {
+                    // tira as bolinhas do gráfico
+                    ChartUtils.setTamanhoMarcador(dados, 0);
+                }
+                if (!estilo.exibirLinha()) {
+                    // tira a linha que liga as bolinhas                  
+                    ChartUtils.setLarguraLinha(dados, 0);
+                }
+                if (estilo.getCor() != null) {
+                    // muda a cor do gráfico
+                    ChartUtils.setCor(dados, estilo.getCor());
+                }
+                // define o estilo da linha
+                ChartUtils.setEstiloLinha(dados, estilo.getEstiloLinha());
             });
 
             // gerando as linhas de tendência
@@ -173,14 +189,44 @@ public class CenaGraficoController implements Initializable {
                         continue;
                     }
                     Funcao f = gerarLinhaDeTendencia(x, y, linhaDeTendencia);
-                    String tituloLinha = linhaDeTendencia.getTitulo() == null
-                            ? "Linha de tendência (" + titulo + ")" : linhaDeTendencia.getTitulo();
+                    String tituloLinha;
+                    if (linhaDeTendencia.getTitulo() == null && linhaDeTendencia.getTipo() == POLINOMIAL) {
+                        switch (linhaDeTendencia.getGrau()) {
+                            case 1:
+                                tituloLinha = "Linear";
+                                break;
+                            case 2:
+                                tituloLinha = "Quadrática";
+                                break;
+                            case 3:
+                                tituloLinha = "Cúbica";
+                                break;
+                            default:
+                                tituloLinha = linhaDeTendencia.getTipo().toString()
+                                        + " grau " + linhaDeTendencia.getGrau();
+                                break;
+                        }
+                        tituloLinha += " (" + titulo + ")";
+                    } else if (linhaDeTendencia.getTitulo() == null) {
+                        tituloLinha = linhaDeTendencia.getTipo().toString() + " (" + titulo + ")";
+                    } else {
+                        tituloLinha = linhaDeTendencia.getTitulo();
+                    }
+                    /*String tituloLinha = linhaDeTendencia.getTitulo() == null
+                            ? "Linha de tendência (" + titulo + ")" : linhaDeTendencia.getTitulo();*/
                     if (linhaDeTendencia.getTipo() == POLINOMIAL && linhaDeTendencia.getGrau() <= 1) {
                         Double[] xn = {x[0], x[x.length - 1]};
                         Double[] yn = {f.f(x[0]), f.f(x[x.length - 1])};
-                        plotPontos(xn, yn, tituloLinha, Estilo.LINHA);
+                        Estilo estiloLinhaDeTendencia = new Estilo.Builder()
+                                .setExibirLinha(true)
+                                .setExibirMarcador(false)
+                                .setCor(linhaDeTendencia.getEstilo().getCor())
+                                .setEstiloLinha(linhaDeTendencia.getEstilo().getEstiloLinha())
+                                .build();
+                        plotPontos(xn, yn, tituloLinha, estiloLinhaDeTendencia);
+
                     } else {
-                        plotFuncao(f, x[0], x[x.length - 1], tituloLinha);
+                        plotFuncao(f, x[0], x[x.length - 1], tituloLinha, linhaDeTendencia.getEstilo());
                     }
                 }
             }
@@ -239,7 +285,7 @@ public class CenaGraficoController implements Initializable {
                 this.stackPane.getChildren().add(l);
                 double h = this.stackPane.getHeight();
                 double w = this.stackPane.getWidth();
-                StackPane.setMargin(l, new Insets(h * 0.15 * stackPane.getChildren().size() - 1, 0, 0, w * 0.4));
+                StackPane.setMargin(l, new Insets(h * 0.12 * stackPane.getChildren().size() - 1, 0, 0, w * 0.4));
             });
             l.setOnMouseDragged(event -> Platform.runLater(() -> StackPane.setMargin(l, new Insets(event.getSceneY(), 0, 0, event.getSceneX()))));
             DecimalFormat df = new DecimalFormat("#.####");

@@ -27,15 +27,25 @@ public class LinhaDeTendencia {
      */
     public static LinhaDeTendencia LOGARITMICA = new LinhaDeTendencia.Builder(Tipo.LOGARITMICA).build();
 
+    // parâmetros da linha de tendência
     private final Tipo tipo;
     private int grau = 1;
     private String titulo = null;
     private double b0 = Double.MAX_VALUE;
 
+    // estilo
+    private Estilo estilo = Estilo.LINHA;
+
+    // informações
     private boolean exibirEquacao = true;
     private boolean exibirR2 = false;
     private boolean exibirSigma2 = false;
 
+    /**
+     * Construtor privado para não permitir a criação instâncias fora da classe
+     *
+     * @param tipo tipo da linha de tendência
+     */
     private LinhaDeTendencia(Tipo tipo) {
         this.tipo = Objects.requireNonNull(tipo, "O tipo da linha de tendência não pode ser nulo.");
     }
@@ -74,7 +84,7 @@ public class LinhaDeTendencia {
     }
 
     /**
-     * Obter o título da linha de tendência
+     * Obter o título da linha de tendência (padrão é null)
      *
      * @return título
      */
@@ -114,7 +124,26 @@ public class LinhaDeTendencia {
     }
 
     /**
-     * Exibir ou não a equação da linha de tendência
+     * Obter o estilo da linha de tendência (padrão é Estilo.LINHA)
+     *
+     * @return estilo
+     */
+    public Estilo getEstilo() {
+        return estilo;
+    }
+
+    /**
+     * Definir o estilo da linha de tendência (padrão é Estilo.LINHA)
+     *
+     * @param estilo estilo
+     */
+    public void setEstilo(Estilo estilo) {
+        Objects.requireNonNull(estilo, "O estilo não pode ser nulo");
+        this.estilo = estilo;
+    }
+
+    /**
+     * Exibir ou não a equação da linha de tendência (padrão é true)
      *
      * @return true or false
      */
@@ -132,7 +161,7 @@ public class LinhaDeTendencia {
     }
 
     /**
-     * Exibir ou não o coeficiente de determinação
+     * Exibir ou não o coeficiente de determinação (padrão é false)
      *
      * @return true or false
      */
@@ -150,7 +179,7 @@ public class LinhaDeTendencia {
     }
 
     /**
-     * Exibir ou não a variância residual
+     * Exibir ou não a variância residual (padrão é false)
      *
      * @return true or false
      */
@@ -182,7 +211,12 @@ public class LinhaDeTendencia {
         /**
          * Linha de tendência logarítmica
          */
-        LOGARITMICA
+        LOGARITMICA;
+
+        @Override
+        public String toString() {
+            return this.name().substring(0, 1) + this.name().substring(1).toLowerCase();
+        }
     }
 
     /**
@@ -232,6 +266,17 @@ public class LinhaDeTendencia {
          */
         public Builder setB0(double b0) {
             this.linhaDeTendencia.setB0(b0);
+            return this;
+        }
+
+        /**
+         * Definir o estilo da linha de tendência (padrão é Estilo.LINHA)
+         *
+         * @param estilo estilo
+         * @return a própria instância do Builder
+         */
+        public Builder setEstilo(Estilo estilo) {
+            this.linhaDeTendencia.setEstilo(estilo);
             return this;
         }
 

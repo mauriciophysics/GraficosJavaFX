@@ -10,4 +10,5 @@ module br.com.mauricioborges.graficos {
   
     exports br.com.mauricioborges.graficos;
     exports br.com.mauricioborges.graficos.math;
+    exports br.com.mauricioborges.graficos.utils;
 }

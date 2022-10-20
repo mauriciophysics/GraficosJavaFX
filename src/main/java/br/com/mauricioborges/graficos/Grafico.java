@@ -35,15 +35,16 @@ public final class Grafico extends Application {
     private String tituloEixoX = null;
     private String tituloEixoY = null;
     // Funcoes
+    private final List<Funcao> funcoes = new ArrayList<>();
     private final List<Double> inicio = new ArrayList<>();
     private final List<Double> fim = new ArrayList<>();
-    private final List<String> titulosFuncoes = new ArrayList<>();
-    private final List<Funcao> funcoes = new ArrayList<>();
+    private final List<String> tituloFuncoes = new ArrayList<>();
+    private final List<Estilo> estiloFuncoes = new ArrayList<>();
     // Pontos
     private final List<Double[]> x = new ArrayList<>();
     private final List<Double[]> y = new ArrayList<>();
-    private final List<String> titulosPontos = new ArrayList<>();
-    private final List<Estilo> estilo = new ArrayList<>();
+    private final List<String> tituloPontos = new ArrayList<>();
+    private final List<Estilo> estiloPontos = new ArrayList<>();
     private final List<LinhaDeTendencia[]> linhasDeTendencia = new ArrayList<>();
 
     /**
@@ -89,17 +90,32 @@ public final class Grafico extends Application {
      * @param inicio início do intervalo
      * @param fim fim do intervalo
      * @param titulo legenda do gráfico
+     * @param estilo opções de estilo
      */
-    public void plotFuncao(Funcao funcao, double inicio, double fim, String titulo) {
+    public void plotFuncao(Funcao funcao, double inicio, double fim, String titulo, Estilo estilo) {
         Objects.requireNonNull(funcao, "A função não pode ser nula.");
+        Objects.requireNonNull(estilo, "O estilo da função não pode ser nulo.");
         this.funcoes.add(funcao);
-        this.titulosFuncoes.add(titulo);
         this.inicio.add(inicio);
         this.fim.add(fim);
+        this.tituloFuncoes.add(titulo);
+        this.estiloFuncoes.add(estilo);
 
         if (controle != null) {
-            controle.plotFuncao(funcao, inicio, fim, titulo);
+            controle.plotFuncao(funcao, inicio, fim, titulo, estilo);
         }
+    }
+
+    /**
+     * Plotar função em determinado intervalo com o estilo padrão
+     *
+     * @param funcao função
+     * @param inicio início do intervalo
+     * @param fim fim do intervalo
+     * @param titulo legenda do gráfico
+     */
+    public void plotFuncao(Funcao funcao, double inicio, double fim, String titulo) {
+        this.plotFuncao(funcao, inicio, fim, titulo, Estilo.LINHA);
     }
 
     /**
@@ -118,9 +134,9 @@ public final class Grafico extends Application {
         Objects.requireNonNull(estilo, "O estilo não pode ser nulo.");
         this.x.add(x);
         this.y.add(y);
-        this.titulosPontos.add(titulo);
+        this.tituloPontos.add(titulo);
+        this.estiloPontos.add(estilo);
         this.linhasDeTendencia.add(linhasDeTendencia);
-        this.estilo.add(estilo);
 
         if (controle != null) {
             controle.plotPontos(x, y, titulo, estilo, linhasDeTendencia);
@@ -176,10 +192,10 @@ public final class Grafico extends Application {
         }
         // plotando os gráficos
         for (int i = 0; i < funcoes.size(); i++) {
-            controle.plotFuncao(funcoes.get(i), inicio.get(i), fim.get(i), titulosFuncoes.get(i));
+            controle.plotFuncao(funcoes.get(i), inicio.get(i), fim.get(i), tituloFuncoes.get(i), estiloFuncoes.get(i));
         }
         for (int i = 0; i < x.size(); i++) {
-            controle.plotPontos(x.get(i), y.get(i), titulosPontos.get(i), estilo.get(i), linhasDeTendencia.get(i));
+            controle.plotPontos(x.get(i), y.get(i), tituloPontos.get(i), estiloPontos.get(i), linhasDeTendencia.get(i));
         }
     }
 
