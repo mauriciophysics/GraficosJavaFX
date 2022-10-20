@@ -9,7 +9,7 @@ Dependência maven:
     &lt;version&gt;1.4&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 
-## Gráfico de função:
+## Gráfico de função
 <pre><code>Funcao f = x -> Math.sin(x);
 Grafico g = new Grafico();
 g.plotFuncao(f, 0, 2*Math.PI, "Seno");
@@ -17,7 +17,7 @@ g.show(stage);</pre></code>
 
 ![Gráfico de função](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDeFuncao.png)
 
-## Gráfico de pontos:
+## Gráfico de pontos
 <pre><code>Double[] x = {1.0, 2.2, 3.84, 4.9, 5.6, 6.2};
 Double[] y = {2.24, 3.71, 4.5, 5.96, 8.48, 16.8};
 Grafico g = new Grafico();
@@ -26,7 +26,7 @@ g.show(stage);</code></pre>
 
 ![Gráfico de pontos](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDePontos.png)
 
-## Linha de tendência:
+## Linha de tendência
 <pre><code>Double[] x = {1.0, 2.2, 3.84, 4.9, 5.6, 6.2};
 Double[] y = {2.24, 3.71, 4.5, 5.96, 8.48, 16.8};
 Grafico g = new Grafico();
@@ -35,7 +35,7 @@ g.show(stage);</code></pre>
 
 ![Gráfico de pontos com linha de tendência](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDePontosComLinhaDeTendencia.png)
 
-A linha de tendência pode ser personalizada, através do padrão Builder
+A linha de tendência pode ser personalizada, através do padrão Builder:
 <pre><code>Double[] x = {1.0, 2.2, 3.84, 4.9, 5.6, 6.2};
 Double[] y = {2.24, 3.71, 4.5, 5.96, 8.48, 16.8};
 Grafico g = new Grafico();
@@ -49,7 +49,7 @@ g.show(stage);</code></pre>
 
 ![Gráfico de pontos com linha de tendência personalizada](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDePontosComLinhaDeTendenciaPersonalizada.png)
 
-## Estilos:
+## Estilos
 <pre><code>Double[] x = {1.0, 2.2, 3.84, 4.9, 5.6, 6.2};
 Double[] y = {2.24, 3.71, 4.5, 5.96, 8.48, 16.8};
 Grafico g = new Grafico();
