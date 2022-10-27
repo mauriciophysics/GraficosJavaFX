@@ -1,7 +1,7 @@
 package br.com.mauricioborges.graficos;
 
 import br.com.mauricioborges.graficos.utils.ChartUtils.EstiloLinha;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javafx.scene.paint.Color;
 
 /**
@@ -32,7 +32,8 @@ public class Estilo {
     private EstiloLinha estiloLinha = EstiloLinha.CONTINUA;
 
     /**
-     * Construtor privado para não permitir a criação instâncias fora da classe
+     * Construtor privado para não permitir a criação de instâncias fora da
+     * classe
      */
     private Estilo() {
     }
@@ -85,7 +86,7 @@ public class Estilo {
     }
 
     /**
-     * Definir a cor associada ao estilo
+     * Definir a cor associada ao estilo (padrão é null)
      *
      * @param cor cor
      */
@@ -103,13 +104,12 @@ public class Estilo {
     }
 
     /**
-     * Definir o estilo da linha do gráfico
+     * Definir o estilo da linha do gráfico (padrão é EstiloLinha.CONTINUA)
      *
      * @param estiloLinha estilo da linha
      */
     public void setEstiloLinha(EstiloLinha estiloLinha) {
-        Objects.requireNonNull(estiloLinha, "O estilo da linha não pode ser nulo");
-        this.estiloLinha = estiloLinha;
+        this.estiloLinha = requireNonNull(estiloLinha, "O estilo da linha não pode ser nulo");
     }
 
     /**
@@ -144,7 +144,7 @@ public class Estilo {
         }
 
         /**
-         * Definir a cor associada ao estilo
+         * Definir a cor associada ao estilo (padrão é null)
          *
          * @param cor cor
          * @return a própria instância do Builder
@@ -155,7 +155,7 @@ public class Estilo {
         }
 
         /**
-         * Definir o estilo da linha do gráfico
+         * Definir o estilo da linha do gráfico (padrão é EstiloLinha.CONTINUA)
          *
          * @param estiloLinha estilo da linha
          * @return a própria instância do Builder

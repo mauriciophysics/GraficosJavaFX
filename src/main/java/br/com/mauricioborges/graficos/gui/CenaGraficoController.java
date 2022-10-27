@@ -4,7 +4,9 @@ import br.com.mauricioborges.graficos.LinhaDeTendencia;
 import br.com.mauricioborges.graficos.Estilo;
 import static br.com.mauricioborges.graficos.LinhaDeTendencia.Tipo.EXPONENCIAL;
 import static br.com.mauricioborges.graficos.LinhaDeTendencia.Tipo.LOGARITMICA;
+import static br.com.mauricioborges.graficos.LinhaDeTendencia.Tipo.MEDIA_MOVEL;
 import static br.com.mauricioborges.graficos.LinhaDeTendencia.Tipo.POLINOMIAL;
+import static br.com.mauricioborges.graficos.LinhaDeTendencia.Tipo.POTENCIA;
 import br.com.mauricioborges.graficos.math.Funcao;
 import br.com.mauricioborges.graficos.math.metodosnumericos.RegressaoLinearMultipla;
 import br.com.mauricioborges.graficos.utils.ChartUtils;
@@ -13,12 +15,14 @@ import br.com.mauricioborges.graficos.utils.FileUtils.Tipo;
 import static br.com.mauricioborges.graficos.utils.TextUtils.sup;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Double.MAX_VALUE;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import static java.util.Arrays.copyOfRange;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import static javafx.embed.swing.SwingFXUtils.fromFXImage;
@@ -100,13 +104,13 @@ public class CenaGraficoController implements Initializable {
             XYChart.Series<Number, Number> dados = new XYChart.Series<>();
             dados.setName(titulo);
             double dx = (fim - inicio) / 1400; // número de pontos a ser calculados e adicionados
-            double fxAnt = funcao.f(inicio - dx);
+            double fxAnt = funcao.apply(inicio - dx);
             boolean erro;
             for (double i = inicio; i <= fim; i += dx) {
                 erro = false;
                 double fx;
                 try {
-                    fx = funcao.f(i);
+                    fx = funcao.apply(i);
                     if (Double.isInfinite(fx) || Double.isNaN(fx) || Math.abs(fx - fxAnt) > .1) {
                         // assíntota vertical na função
                         erro = true;
@@ -188,47 +192,74 @@ public class CenaGraficoController implements Initializable {
                     if (linhaDeTendencia == null) {
                         continue;
                     }
-                    Funcao f = gerarLinhaDeTendencia(x, y, linhaDeTendencia);
-                    String tituloLinha;
+                    if ((linhaDeTendencia.getTipo() == MEDIA_MOVEL && y.length < 3)
+                            || (linhaDeTendencia.getTipo() == MEDIA_MOVEL && linhaDeTendencia.getNumeroDePontos() > y.length - 1)) {
+                        // não é possível gerar a linha de tendência
+                        continue;
+                    }
+                    Funcao f = linhaDeTendencia.getTipo() != MEDIA_MOVEL
+                            ? gerarLinhaDeTendencia(x, y, linhaDeTendencia) : null;
+                    // gerando o título com base no tipo da linha de tendência
+                    StringBuilder tituloLinha = new StringBuilder();
                     if (linhaDeTendencia.getTitulo() == null && linhaDeTendencia.getTipo() == POLINOMIAL) {
                         switch (linhaDeTendencia.getGrau()) {
-                            case 1:
-                                tituloLinha = "Linear";
-                                break;
-                            case 2:
-                                tituloLinha = "Quadrática";
-                                break;
-                            case 3:
-                                tituloLinha = "Cúbica";
-                                break;
-                            default:
-                                tituloLinha = linhaDeTendencia.getTipo().toString()
-                                        + " grau " + linhaDeTendencia.getGrau();
-                                break;
+                            case 1 ->
+                                tituloLinha.append("Linear");
+                            case 2 ->
+                                tituloLinha.append("Quadrática");
+                            case 3 ->
+                                tituloLinha.append("Cúbica");
+                            default ->
+                                tituloLinha.append(linhaDeTendencia.getTipo().toString())
+                                        .append(" grau ").append(linhaDeTendencia.getGrau());
                         }
-                        tituloLinha += " (" + titulo + ")";
+                        tituloLinha.append(" (").append(titulo).append(")");
+                    } else if (linhaDeTendencia.getTitulo() == null && linhaDeTendencia.getTipo() == MEDIA_MOVEL) {
+                        tituloLinha.append(linhaDeTendencia.getTipo().toString()).append(" de ")
+                                .append(linhaDeTendencia.getNumeroDePontos()).append(" pontos (")
+                                .append(titulo).append(")");
                     } else if (linhaDeTendencia.getTitulo() == null) {
-                        tituloLinha = linhaDeTendencia.getTipo().toString() + " (" + titulo + ")";
+                        tituloLinha.append(linhaDeTendencia.getTipo().toString()).append(" (").append(titulo).append(")");
                     } else {
-                        tituloLinha = linhaDeTendencia.getTitulo();
+                        tituloLinha.append(linhaDeTendencia.getTitulo());
                     }
-                    /*String tituloLinha = linhaDeTendencia.getTitulo() == null
-                            ? "Linha de tendência (" + titulo + ")" : linhaDeTendencia.getTitulo();*/
-                    if (linhaDeTendencia.getTipo() == POLINOMIAL && linhaDeTendencia.getGrau() <= 1) {
-                        Double[] xn = {x[0], x[x.length - 1]};
-                        Double[] yn = {f.f(x[0]), f.f(x[x.length - 1])};
+                    // definindo o início e o fim do intervalo
+                    double inicio = (linhaDeTendencia.getInicio() != MAX_VALUE
+                            && linhaDeTendencia.getInicio() < x[0]) ? linhaDeTendencia.getInicio() : x[0];
+                    double fim = (linhaDeTendencia.getFim() != MAX_VALUE
+                            && linhaDeTendencia.getFim() > x[x.length - 1]) ? linhaDeTendencia.getFim() : x[x.length - 1];
+                    // plotando a linha de tendência
+                    if ((linhaDeTendencia.getTipo() == POLINOMIAL && linhaDeTendencia.getGrau() <= 1)
+                            || linhaDeTendencia.getTipo() == MEDIA_MOVEL) {
+                        Double[] xn;
+                        Double[] yn;
+                        if (linhaDeTendencia.getTipo() == MEDIA_MOVEL) {
+                            int nPontos = linhaDeTendencia.getNumeroDePontos();
+                            xn = copyOfRange(x, nPontos - 1, x.length);
+                            yn = new Double[y.length + 1 - nPontos];
+                            for (int i = 0; i < yn.length; i++) {
+                                yn[i] = 0.0;
+                                for (int n = 0; n < nPontos; n++) {
+                                    yn[i] += y[n + i];
+                                }
+                                yn[i] /= nPontos;
+                            }
+                        } else {
+                            xn = new Double[]{inicio, fim};
+                            yn = new Double[]{f.apply(inicio), f.apply(fim)};
+                        }
                         Estilo estiloLinhaDeTendencia = new Estilo.Builder()
                                 .setExibirLinha(true)
                                 .setExibirMarcador(false)
                                 .setCor(linhaDeTendencia.getEstilo().getCor())
                                 .setEstiloLinha(linhaDeTendencia.getEstilo().getEstiloLinha())
                                 .build();
-                        plotPontos(xn, yn, tituloLinha, estiloLinhaDeTendencia);
-
+                        plotPontos(xn, yn, tituloLinha.toString(), estiloLinhaDeTendencia);
                     } else {
-                        plotFuncao(f, x[0], x[x.length - 1], tituloLinha, linhaDeTendencia.getEstilo());
+                        plotFuncao(f, inicio, fim, tituloLinha.toString(), linhaDeTendencia.getEstilo());
                     }
                 }
+                System.gc();
             }
         }).start();
     }
@@ -244,15 +275,15 @@ public class CenaGraficoController implements Initializable {
     private Funcao gerarLinhaDeTendencia(Double[] x, Double[] y, LinhaDeTendencia linhaDeTendencia) {
         // criando novos arrays de X e Y, pois o algoritmo da
         // Regressão Linear Múltipla requer que os índices comecem em 1
-        Double[][] xn = new Double[x.length + 1][linhaDeTendencia.getGrau() + 2];
+        Double[][] xn = new Double[x.length + 1][linhaDeTendencia.getGrau() + 3];
         Double[] yn = new Double[y.length + 1];
         for (int i = 0; i < x.length; i++) {
-            if (linhaDeTendencia.getTipo() == LOGARITMICA) {
+            if (linhaDeTendencia.getTipo() == LOGARITMICA || linhaDeTendencia.getTipo() == POTENCIA) {
                 xn[i + 1][1] = log(x[i]);
             } else {
                 xn[i + 1][1] = x[i];
             }
-            if (linhaDeTendencia.getTipo() == EXPONENCIAL) {
+            if (linhaDeTendencia.getTipo() == EXPONENCIAL || linhaDeTendencia.getTipo() == POTENCIA) {
                 yn[i + 1] = log(y[i]);
             } else {
                 yn[i + 1] = y[i];
@@ -292,35 +323,53 @@ public class CenaGraficoController implements Initializable {
             if (exibirEquacao) {
                 StringBuilder sb = new StringBuilder("y = ");
                 switch (linhaDeTendencia.getTipo()) {
-                    case EXPONENCIAL:
-                        sb.append(df.format(exp(b[1]))).append("e").append(sup(df.format(b[2]))).append(sup("x"));
-                        break;
-                    case LOGARITMICA:
-                        sb.append(df.format(b[2])).append("ln(x)");
-                        if (b[1] > 0) {
-                            sb.append(" + ").append(df.format(b[1]));
-                        } else if (b[1] < 0) {
-                            sb.append(" - ").append(df.format(Math.abs(b[1])));
+                    case EXPONENCIAL -> {
+                        String a1 = df.format(exp(b[1]));
+                        String a2 = df.format(b[2]);
+                        sb.append(a1.equals("1") ? (a2.equals("0") ? "1" : "") : a1);
+                        if (!a2.equals("0")) {
+                            sb.append("e").append(a2.equals("1") ? "" : sup(a2)).append(sup("x"));
                         }
-                        break;
-                    default:
+                    }
+                    case LOGARITMICA -> {
+                        String a1 = df.format(b[2]);
+                        if (!a1.equals("0")) {
+                            sb.append(a1.equals("1") ? "" : a1).append("ln(x)");
+                        }
+                        if (a1.equals("0")) {
+                            sb.append(df.format(b[1]));
+                        } else {
+                            if (b[1] > 0) {
+                                sb.append(" + ").append(df.format(b[1]));
+                            } else if (b[1] < 0) {
+                                sb.append(" - ").append(df.format(Math.abs(b[1])));
+                            }
+                        }
+                    }
+                    case POTENCIA -> {
+                        String a1 = df.format(exp(b[1]));
+                        String a2 = df.format(b[2]);
+                        sb.append(a1.equals("1") ? (a2.equals("0") ? "1" : "") : a1);
+                        if (!a2.equals("0")) {
+                            sb.append("x").append(a2.equals("1") ? "" : sup(a2));
+                        }
+                    }
+                    default -> {
                         for (int i = b.length - 1; i >= 1; i--) {
-                            double bi = b[i];
-                            if (i != b.length - 1 && bi > 0) {
+                            if (i != b.length - 1 && b[i] > 0) {
                                 sb.append(" + ");
-                            } else if (i != b.length - 1 && bi < 0) {
+                            } else if (i != b.length - 1 && b[i] < 0) {
                                 sb.append(" - ");
-                            } else if (bi == 0) {
+                            } else if (b[i] == 0) {
                                 continue;
                             }
-                            sb.append(df.format(i != b.length - 1 ? Math.abs(bi) : bi));
-                            if (i > 2) {
-                                sb.append("x").append(sup(i - 1));
-                            } else if (i == 2) {
-                                sb.append("x");
+                            if (!df.format(b[i]).equals("1") || i == 1) {
+                                sb.append(df.format(i != b.length - 1 ? Math.abs(b[i]) : b[i]));
                             }
+                            sb.append(i - 1 > 0 ? "x" : "");
+                            sb.append(i - 1 >= 2 ? sup(i - 1) : "");
                         }
-                        break;
+                    }
                 }
                 info.append(info.isEmpty() ? "" : "\n").append(sb.toString());
             }
@@ -337,17 +386,17 @@ public class CenaGraficoController implements Initializable {
         Funcao f = xf -> {
             double resultado = 0;
             switch (linhaDeTendencia.getTipo()) {
-                case EXPONENCIAL:
+                case EXPONENCIAL ->
                     resultado += exp(b[1]) * exp(xf * b[2]);
-                    break;
-                case LOGARITMICA:
+                case LOGARITMICA ->
                     resultado += b[2] * log(xf) + b[1];
-                    break;
-                default:
+                case POTENCIA ->
+                    resultado += exp(b[1]) * pow(xf, b[2]);
+                default -> {
                     for (int i = 1; i < b.length; i++) {
                         resultado += pow(xf, i - 1) * b[i];
                     }
-                    break;
+                }
             }
             return resultado;
         };

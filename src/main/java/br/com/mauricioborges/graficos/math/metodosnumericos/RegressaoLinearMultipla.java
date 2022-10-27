@@ -1,5 +1,6 @@
 package br.com.mauricioborges.graficos.math.metodosnumericos;
 
+import static br.com.mauricioborges.graficos.utils.ArrayUtils.copy;
 import static java.lang.Math.pow;
 
 /**
@@ -12,11 +13,11 @@ import static java.lang.Math.pow;
 public class RegressaoLinearMultipla {
 
     // parâmetros do método
-    private final int n;
+    private int n;
     private final int v;
     private final int p;
-    private final Double[][] X;
-    private final Double[] Y;
+    private Double[][] X;
+    private Double[] Y;
     private double b0 = Double.MAX_VALUE;
 
     // resultados
@@ -84,7 +85,30 @@ public class RegressaoLinearMultipla {
      */
     public Double[] solve() {
         if (v > 1 && v + 1 != p) {
-            throw new RuntimeException("ERRO regressaoLinearMultipla!");
+            throw new ArithmeticException("ERRO regressaoLinearMultipla! Não é possível calcular a regressão.");
+        }
+
+        if (b0 != Double.MAX_VALUE) {
+            RegressaoLinearMultipla rlm = new RegressaoLinearMultipla(n, v, p, copy(X), Y.clone());
+            rlm.solve();
+            r2 = rlm.getR2();
+            sigma2 = rlm.getSigma2();
+
+            int addPontos = (int) 5e5;
+            Double[][] Xn = new Double[X.length + addPontos][X[1].length];
+            Double[] Yn = new Double[Y.length + addPontos];
+            for (int i = 1; i < X.length; i++) {
+                Xn[i][1] = X[i][1];
+                Yn[i] = Y[i];
+            }
+            int oldLength = X.length;
+            X = Xn;
+            Y = Yn;
+            for (int i = oldLength; i < X.length; i++) {
+                X[i][1] = 0d;
+                Y[i] = b0;
+            }
+            n += addPontos;
         }
 
         int vp1 = v + 1;
@@ -145,8 +169,10 @@ public class RegressaoLinearMultipla {
             Sy2 += pow(Y[i], 2);
         }
 
-        r2 = 1 - (D / (Sy2 - (pow(Sxy[1], 2) / n))); // coeficiente de determinação
-        sigma2 = D / (n - p); // variância residual
+        if (b0 == Double.MAX_VALUE) {
+            r2 = 1 - (D / (Sy2 - (pow(Sxy[1], 2) / n))); // coeficiente de determinação
+            sigma2 = D / (n - p); // variância residual
+        }
 
         return b;
     }

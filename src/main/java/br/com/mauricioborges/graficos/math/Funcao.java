@@ -6,13 +6,14 @@ package br.com.mauricioborges.graficos.math;
  * @author Mauricio Borges
  * @since 2018
  */
+@FunctionalInterface
 public interface Funcao {
 
     /**
-     * Função matemática
+     * Aplicar o valor do parâmetro na função matemática
      *
      * @param x parâmetro
      * @return resultado da expressão matemática
      */
-    public abstract double f(double x);
+    public abstract double apply(double x);
 }

@@ -6,7 +6,7 @@ import static br.com.mauricioborges.graficos.utils.FXUtils.findResource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -93,13 +93,11 @@ public final class Grafico extends Application {
      * @param estilo opções de estilo
      */
     public void plotFuncao(Funcao funcao, double inicio, double fim, String titulo, Estilo estilo) {
-        Objects.requireNonNull(funcao, "A função não pode ser nula.");
-        Objects.requireNonNull(estilo, "O estilo da função não pode ser nulo.");
-        this.funcoes.add(funcao);
+        this.funcoes.add(requireNonNull(funcao, "A função não pode ser nula."));
         this.inicio.add(inicio);
         this.fim.add(fim);
-        this.tituloFuncoes.add(titulo);
-        this.estiloFuncoes.add(estilo);
+        this.tituloFuncoes.add(requireNonNull(titulo, "O título da função não pode ser nulo."));
+        this.estiloFuncoes.add(requireNonNull(estilo, "O estilo da função não pode ser nulo."));
 
         if (controle != null) {
             controle.plotFuncao(funcao, inicio, fim, titulo, estilo);
@@ -131,11 +129,10 @@ public final class Grafico extends Application {
         if (x.length != y.length) {
             throw new UnsupportedOperationException("Os arrays de X e Y devem ter o mesmo tamanho.");
         }
-        Objects.requireNonNull(estilo, "O estilo não pode ser nulo.");
         this.x.add(x);
         this.y.add(y);
-        this.tituloPontos.add(titulo);
-        this.estiloPontos.add(estilo);
+        this.tituloPontos.add(requireNonNull(titulo, "O título dos pontos não pode ser nulo."));
+        this.estiloPontos.add(requireNonNull(estilo, "O estilo dos pontos não pode ser nulo."));
         this.linhasDeTendencia.add(linhasDeTendencia);
 
         if (controle != null) {
@@ -207,7 +204,7 @@ public final class Grafico extends Application {
      */
     @Override
     public final void start(Stage janela) {
-        Objects.requireNonNull(janela, "A janela não pode ser nula.");
+        requireNonNull(janela, "A janela não pode ser nula.");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(findResource("gui/CenaGrafico.fxml"));
         Parent root;

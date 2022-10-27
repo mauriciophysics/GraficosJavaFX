@@ -56,7 +56,7 @@ public class Cholesky {
                 r = 1 / A[j][j];
                 determinante *= t;
             } else {
-                throw new RuntimeException("ERRO metodoCholesky: A matriz não é definida positiva!");
+                throw new ArithmeticException("ERRO metodoCholesky: A matriz não é definida positiva!");
             }
             for (int i = (j + 1); i <= n; i++) {
                 soma = 0;

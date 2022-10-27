@@ -1,6 +1,6 @@
 package br.com.mauricioborges.graficos;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Linha de tendência para gráficos de conjuntos de pontos
@@ -26,10 +26,21 @@ public class LinhaDeTendencia {
      * Logarítmica
      */
     public static LinhaDeTendencia LOGARITMICA = new LinhaDeTendencia.Builder(Tipo.LOGARITMICA).build();
+    /**
+     * Potência de x
+     */
+    public static LinhaDeTendencia POTENCIA = new LinhaDeTendencia.Builder(Tipo.POTENCIA).build();
+    /**
+     * Média móvel
+     */
+    public static LinhaDeTendencia MEDIA_MOVEL = new LinhaDeTendencia.Builder(Tipo.MEDIA_MOVEL).build();
 
     // parâmetros da linha de tendência
     private final Tipo tipo;
-    private int grau = 1;
+    private int grau = 1; // linhas de tendência polinomiais
+    private int numeroDePontos = 2; // linha de tendência média móvel
+    private double inicio = Double.MAX_VALUE;
+    private double fim = Double.MAX_VALUE;
     private String titulo = null;
     private double b0 = Double.MAX_VALUE;
 
@@ -42,12 +53,13 @@ public class LinhaDeTendencia {
     private boolean exibirSigma2 = false;
 
     /**
-     * Construtor privado para não permitir a criação instâncias fora da classe
+     * Construtor privado para não permitir a criação de instâncias fora da
+     * classe
      *
      * @param tipo tipo da linha de tendência
      */
     private LinhaDeTendencia(Tipo tipo) {
-        this.tipo = Objects.requireNonNull(tipo, "O tipo da linha de tendência não pode ser nulo.");
+        this.tipo = requireNonNull(tipo, "O tipo da linha de tendência não pode ser nulo.");
     }
 
     /**
@@ -60,7 +72,7 @@ public class LinhaDeTendencia {
     }
 
     /**
-     * Obter o grau do polinômio
+     * Obter o grau do polinômio (padrão é 1)
      *
      * @return grau
      */
@@ -69,18 +81,86 @@ public class LinhaDeTendencia {
     }
 
     /**
-     * Definir o grau do polinômio
+     * Definir o grau do polinômio (padrão é 1)
      *
      * @param grau grau
      */
     public void setGrau(int grau) {
+        if (tipo != Tipo.POLINOMIAL) {
+            throw new UnsupportedOperationException("Só é possível alterar o grau de linhas de tendência polinomiais.");
+        }
         if (grau < 0) {
             throw new IllegalArgumentException("O grau da linha de tendência não pode ser negativo.");
         }
-        if (tipo != Tipo.POLINOMIAL) {
-            throw new IllegalArgumentException("Só é possível alterar o grau de linhas de tendência polinomiais.");
-        }
         this.grau = grau;
+    }
+
+    /**
+     * Obter o número de pontos da média móvel
+     *
+     * @return número de pontos
+     */
+    public int getNumeroDePontos() {
+        return numeroDePontos;
+    }
+
+    /**
+     * Definir o número de pontos da média móvel
+     *
+     * @param numeroDePontos número de pontos
+     */
+    public void setNumeroDePontos(int numeroDePontos) {
+        if (tipo != Tipo.MEDIA_MOVEL) {
+            throw new UnsupportedOperationException("Só é possível alterar o número de pontos de linha de tendência média móvel.");
+        }
+        if (numeroDePontos < 2) {
+            throw new IllegalArgumentException("O número de pontos da média móvel não pode ser menor do que 2.");
+        }
+        this.numeroDePontos = numeroDePontos;
+    }
+
+    /**
+     * Obter o início do intervalo
+     *
+     * @return valor (se nenhum valor tiver sido definido, retornará
+     * Double.MAX_VALUE)
+     */
+    public double getInicio() {
+        return inicio;
+    }
+
+    /**
+     * Definir o início do intervalo
+     *
+     * @param inicio início
+     */
+    public void setInicio(double inicio) {
+        if (tipo == Tipo.MEDIA_MOVEL) {
+            throw new UnsupportedOperationException("Não é possível definir o início do intervalo de linha de tendência média móvel");
+        }
+        this.inicio = inicio;
+    }
+
+    /**
+     * Obter o fim do intervalo
+     *
+     * @return valor (se nenhum valor tiver sido definido, retornará
+     * Double.MAX_VALUE)
+     */
+    public double getFim() {
+        return fim;
+    }
+
+    /**
+     * Definir o fim do intervalo
+     *
+     * @param fim fim
+     */
+    public void setFim(double fim) {
+        if (tipo == Tipo.MEDIA_MOVEL) {
+            throw new UnsupportedOperationException("Não é possível definir o fim do intervalo de linha de tendência média móvel");
+        }
+        this.fim = fim;
     }
 
     /**
@@ -93,7 +173,7 @@ public class LinhaDeTendencia {
     }
 
     /**
-     * Definir o título da linha de tendência
+     * Definir o título da linha de tendência (padrão é null)
      *
      * @param titulo título
      */
@@ -104,7 +184,8 @@ public class LinhaDeTendencia {
     /**
      * Obter o ponto de intersecção com o eixo Y
      *
-     * @return valor
+     * @return valor (se nenhum valor tiver sido definido, retornará
+     * Double.MAX_VALUE)
      */
     public double getB0() {
         return b0;
@@ -116,11 +197,15 @@ public class LinhaDeTendencia {
      * @param b0 valor
      */
     public void setB0(double b0) {
-        if (tipo == Tipo.LOGARITMICA) {
-            throw new IllegalArgumentException("Não é possível alterar o ponto de "
-                    + "intersecção com o eixo Y de linhas de tendência logarítmicas.");
+        if (tipo == Tipo.LOGARITMICA || tipo == Tipo.POTENCIA || tipo == Tipo.MEDIA_MOVEL) {
+            throw new UnsupportedOperationException("Não é possível alterar o ponto de intersecção "
+                    + "com o eixo Y de linha de tendência " + tipo.toString().toLowerCase());
         }
-        this.b0 = b0;
+        if (tipo == Tipo.EXPONENCIAL && b0 <= 0) {
+            throw new IllegalArgumentException("Não é possível uma intersecção do eixo Y em valores "
+                    + "menores ou iguais a zero para uma função exponencial");
+        }
+        this.b0 = tipo == Tipo.EXPONENCIAL ? Math.log(b0) : b0;
     }
 
     /**
@@ -138,8 +223,7 @@ public class LinhaDeTendencia {
      * @param estilo estilo
      */
     public void setEstilo(Estilo estilo) {
-        Objects.requireNonNull(estilo, "O estilo não pode ser nulo");
-        this.estilo = estilo;
+        this.estilo = requireNonNull(estilo, "O estilo não pode ser nulo");
     }
 
     /**
@@ -157,6 +241,9 @@ public class LinhaDeTendencia {
      * @param exibirEquacao true or false
      */
     public void setExibirEquacao(boolean exibirEquacao) {
+        if (tipo == Tipo.MEDIA_MOVEL) {
+            throw new UnsupportedOperationException("Não é possível exibir a equação de linha de tendência média móvel");
+        }
         this.exibirEquacao = exibirEquacao;
     }
 
@@ -175,6 +262,9 @@ public class LinhaDeTendencia {
      * @param exibirR2 true or false
      */
     public void setExibirR2(boolean exibirR2) {
+        if (tipo == Tipo.MEDIA_MOVEL) {
+            throw new UnsupportedOperationException("Não é possível exibir o r² de linha de tendência média móvel");
+        }
         this.exibirR2 = exibirR2;
     }
 
@@ -193,6 +283,9 @@ public class LinhaDeTendencia {
      * @param exibirSigma2 true or false
      */
     public void setExibirSigma2(boolean exibirSigma2) {
+        if (tipo == Tipo.MEDIA_MOVEL) {
+            throw new UnsupportedOperationException("Não é possível exibir o σ² de linha de tendência média móvel");
+        }
         this.exibirSigma2 = exibirSigma2;
     }
 
@@ -203,19 +296,33 @@ public class LinhaDeTendencia {
         /**
          * Linha de tendência polinomial
          */
-        POLINOMIAL,
+        POLINOMIAL("Polinomial"),
         /**
          * Linha de tendência exponencial
          */
-        EXPONENCIAL,
+        EXPONENCIAL("Exponencial"),
         /**
          * Linha de tendência logarítmica
          */
-        LOGARITMICA;
+        LOGARITMICA("Logarítmica"),
+        /**
+         * Linha de tendência de potência de x
+         */
+        POTENCIA("Potência de x"),
+        /**
+         * Linha de tendência média móvel
+         */
+        MEDIA_MOVEL("Média móvel");
+
+        private final String titulo;
+
+        private Tipo(String titulo) {
+            this.titulo = titulo;
+        }
 
         @Override
         public String toString() {
-            return this.name().substring(0, 1) + this.name().substring(1).toLowerCase();
+            return this.titulo;
         }
     }
 
@@ -237,7 +344,7 @@ public class LinhaDeTendencia {
         }
 
         /**
-         * Definir o grau do polinômio
+         * Definir o grau do polinômio (padrão é 1)
          *
          * @param grau grau
          * @return a própria instância do Builder
@@ -248,7 +355,40 @@ public class LinhaDeTendencia {
         }
 
         /**
-         * Definir o título da linha de tendência
+         * Definir o número de pontos da média móvel
+         *
+         * @param numeroDePontos número de pontos
+         * @return a própria instância do Builder
+         */
+        public Builder setNumeroDePontos(int numeroDePontos) {
+            this.linhaDeTendencia.setNumeroDePontos(numeroDePontos);
+            return this;
+        }
+
+        /**
+         * Definir o início do intervalo
+         *
+         * @param inicio início
+         * @return a própria instância do Builder
+         */
+        public Builder setInicio(double inicio) {
+            this.linhaDeTendencia.setInicio(inicio);
+            return this;
+        }
+
+        /**
+         * Definir o fim do intervalo
+         *
+         * @param fim fim
+         * @return a própria instância do Builder
+         */
+        public Builder setFim(double fim) {
+            this.linhaDeTendencia.setFim(fim);
+            return this;
+        }
+
+        /**
+         * Definir o título da linha de tendência (padrão é null)
          *
          * @param titulo título
          * @return a própria instância do Builder

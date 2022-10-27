@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.mauriciophysics</groupId>
     <artifactId>Graficos</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -12,7 +12,7 @@
         <maven.compiler.target>18</maven.compiler.target>
     </properties>
     
-    <name>Gráficos Java FX</name>
+    <name>Gráficos JavaFX</name>
     <description>Construção de gráficos baseados na API JavaFX.</description>
     <url>https://github.com/mauriciophysics/GraficosJavaFX</url>
 
