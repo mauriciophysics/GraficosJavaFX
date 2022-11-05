@@ -2,12 +2,16 @@
 
 Biblioteca baseada na API JavaFX para construção de gráficos de funções matemáticas e conjuntos de pontos.
 
+## Informações gerais
 Dependência maven:
 <pre><code>&lt;dependency&gt;
     &lt;groupId&gt;io.github.mauriciophysics&lt;/groupId&gt;
     &lt;artifactId&gt;Graficos&lt;/artifactId&gt;
-    &lt;version&gt;1.5&lt;/version&gt;
+    &lt;version&gt;1.7&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
+
+É possível exibir o gráfico em uma Stage ou em um AnchorPane, através da sobrecarga do método <code>show()</code><br/>
+Para salvar uma imagem do gráfico, basta clicar com o botão direito do mouse e escolher a opção no menu!
 
 ## Gráfico de função
 <pre><code>Funcao f = x -> Math.sin(x);
@@ -69,5 +73,3 @@ g.plotPontos(x, y, "Pontos", estilo, quadratica);
 g.show(stage);</code></pre>
 
 ![Gráfico de pontos com linha de tendência estilizada](https://github.com/mauriciophysics/GraficosJavaFX/blob/master/imagens/GraficoDePontosComLinhaDeTendenciaEstilizada.png)
-
-Para salvar uma imagem do gráfico, basta clicar com o botão direito do mouse e escolher a opção no menu!
