@@ -13,27 +13,27 @@ public class LinhaDeTendencia {
     /**
      * Linear (polinomial de grau 1)
      */
-    public static LinhaDeTendencia LINEAR = new LinhaDeTendencia.Builder(Tipo.POLINOMIAL).setGrau(1).build();
+    public static final LinhaDeTendencia LINEAR = new LinhaDeTendencia.Builder(Tipo.POLINOMIAL).setGrau(1).build();
     /**
      * Quadrática (polinomial de grau 2)
      */
-    public static LinhaDeTendencia QUADRATICA = new LinhaDeTendencia.Builder(Tipo.POLINOMIAL).setGrau(2).build();
+    public static final LinhaDeTendencia QUADRATICA = new LinhaDeTendencia.Builder(Tipo.POLINOMIAL).setGrau(2).build();
     /**
      * Exponencial
      */
-    public static LinhaDeTendencia EXPONENCIAL = new LinhaDeTendencia.Builder(Tipo.EXPONENCIAL).build();
+    public static final LinhaDeTendencia EXPONENCIAL = new LinhaDeTendencia.Builder(Tipo.EXPONENCIAL).build();
     /**
      * Logarítmica
      */
-    public static LinhaDeTendencia LOGARITMICA = new LinhaDeTendencia.Builder(Tipo.LOGARITMICA).build();
+    public static final LinhaDeTendencia LOGARITMICA = new LinhaDeTendencia.Builder(Tipo.LOGARITMICA).build();
     /**
      * Potência de x
      */
-    public static LinhaDeTendencia POTENCIA = new LinhaDeTendencia.Builder(Tipo.POTENCIA).build();
+    public static final LinhaDeTendencia POTENCIA = new LinhaDeTendencia.Builder(Tipo.POTENCIA).build();
     /**
      * Média móvel
      */
-    public static LinhaDeTendencia MEDIA_MOVEL = new LinhaDeTendencia.Builder(Tipo.MEDIA_MOVEL).build();
+    public static final LinhaDeTendencia MEDIA_MOVEL = new LinhaDeTendencia.Builder(Tipo.MEDIA_MOVEL).build();
 
     // parâmetros da linha de tendência
     private final Tipo tipo;

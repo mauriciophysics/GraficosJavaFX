@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 /**
@@ -34,6 +35,7 @@ public final class Grafico extends Application {
     private String tituloGrafico = null;
     private String tituloEixoX = null;
     private String tituloEixoY = null;
+    private boolean jaAbriuGrafico = false;
     // Funcoes
     private final List<Funcao> funcoes = new ArrayList<>();
     private final List<Double> inicio = new ArrayList<>();
@@ -176,13 +178,57 @@ public final class Grafico extends Application {
         this.plotPontos(x, y, titulo, Estilo.LINHA_E_MARCADOR, linhasDeTendencia);
     }
 
+    private Parent carregarFXML() {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(findResource("gui/CenaGrafico.fxml"));
+        Parent root;
+        try {
+            root = loader.load();
+            controle = loader.getController();
+        } catch (IOException ex) {
+            throw new RuntimeException("Erro ao tentar carregar o FXML do gráfico.", ex);
+        }
+
+        // titulo do gráfico no controller
+        controle.setTituloGrafico(tituloGrafico);
+        // titulo dos eixos no controller
+        controle.setTituloEixos(tituloEixoX, tituloEixoY);
+
+        return root;
+    }
+
     /**
-     * Exibir o gráfico.<br>
+     * Exibir o gráfico em um AnchorPane.
+     *
+     * @param painel painel onde o gráfico será exibido
+     */
+    public final void show(AnchorPane painel) {
+        if (jaAbriuGrafico) {
+            return;
+        }
+        requireNonNull(painel, "O painel não pode ser nulo.");
+
+        Parent p = carregarFXML();
+        painel.getChildren().clear();
+        painel.getChildren().add(p);
+
+        AnchorPane.setTopAnchor(p, 0d);
+        AnchorPane.setBottomAnchor(p, 0d);
+        AnchorPane.setLeftAnchor(p, 0d);
+        AnchorPane.setRightAnchor(p, 0d);
+        show((Stage) null);
+    }
+
+    /**
+     * Exibir o gráfico em uma janela.<br>
      * Mesmo que chamar o método <code>start(Stage janela)</code>
      *
      * @param janela janela onde o gráfico será exibido
      */
     public final void show(Stage janela) {
+        if (jaAbriuGrafico) {
+            return;
+        }
         if (controle == null) {
             this.start(janela);
             return;
@@ -194,38 +240,30 @@ public final class Grafico extends Application {
         for (int i = 0; i < x.size(); i++) {
             controle.plotPontos(x.get(i), y.get(i), tituloPontos.get(i), estiloPontos.get(i), linhasDeTendencia.get(i));
         }
+        jaAbriuGrafico = true;
     }
 
     /**
-     * Exibir o gráfico.<br>
+     * Exibir o gráfico em uma janela.<br>
      * Mesmo que chamar o método <code>show(Stage janela)</code>
      *
      * @param janela janela onde o gráfico será exibido
      */
     @Override
     public final void start(Stage janela) {
-        requireNonNull(janela, "A janela não pode ser nula.");
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(findResource("gui/CenaGrafico.fxml"));
-        Parent root;
-        try {
-            root = loader.load();
-            controle = loader.getController();
-            Scene scene = new Scene(root);
-            janela.setTitle(tituloJanela);
-            janela.setScene(scene);
-        } catch (IOException ex) {
-            throw new RuntimeException("Erro ao tentar iniciar a janela do gráfico.", ex);
+        if (jaAbriuGrafico) {
+            return;
         }
+        requireNonNull(janela, "A janela não pode ser nula.");
+
+        // carregando e adicionando a cena na janela
+        Scene scene = new Scene(carregarFXML());
+        janela.setTitle(tituloJanela);
+        janela.setScene(scene);
 
         // adicionando o icone da janela
         Image icone = new Image(findResource("gui/img/iconeJava.png").toString());
         janela.getIcons().add(icone);
-
-        // titulo do gráfico no controller
-        controle.setTituloGrafico(tituloGrafico);
-        // titulo dos eixos no controller
-        controle.setTituloEixos(tituloEixoX, tituloEixoY);
 
         // configurando e exibindo a janela
         janela.setOnCloseRequest(event -> System.exit(0));

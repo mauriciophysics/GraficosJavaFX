@@ -15,15 +15,15 @@ public class Estilo {
     /**
      * Apenas linha
      */
-    public static Estilo LINHA = new Estilo.Builder().setExibirMarcador(false).build();
+    public static final Estilo LINHA = new Estilo.Builder().setExibirMarcador(false).build();
     /**
      * Apenas marcador
      */
-    public static Estilo MARCADOR = new Estilo.Builder().setExibirLinha(false).build();
+    public static final Estilo MARCADOR = new Estilo.Builder().setExibirLinha(false).build();
     /**
      * Linha e marcador
      */
-    public static Estilo LINHA_E_MARCADOR = new Estilo.Builder().build();
+    public static final Estilo LINHA_E_MARCADOR = new Estilo.Builder().build();
 
     // parâmetros do estilo
     private boolean exibirLinha = true;
