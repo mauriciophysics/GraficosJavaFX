@@ -13,7 +13,7 @@
     </properties>
     
     <name>Gráficos JavaFX</name>
-    <description>Construção de gráficos baseados na API JavaFX.</description>
+    <description>Biblioteca baseada na API JavaFX para construção de gráficos de funções matemáticas e conjuntos de pontos.</description>
     <url>https://github.com/mauriciophysics/GraficosJavaFX</url>
 
     <licenses>
